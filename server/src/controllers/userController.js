@@ -56,7 +56,7 @@ export const ReceiveMessage = async (req, res, next) => {
       return next(error);
     }
 
-    const conversatation = await Message.find({
+    const conversation = await Message.find({
       $or: [
         { senderID: SenderID, receiverID: ReceiverID },
         { senderID: ReceiverID, receiverID: SenderID },
@@ -65,10 +65,7 @@ export const ReceiveMessage = async (req, res, next) => {
       .populate("receiverID", "fullName photo")
       .populate("senderID", "fullName photo")
       .sort({ createdAt: 1 });
-
-    res
-      .status(201)
-      .json({ message: "Message Sent Sucessfully", data: conversatation });
+    res.status(200).json({ message: "Conversation fetched successfully", data: conversation });
   } catch (error) {
     next(error);
   }

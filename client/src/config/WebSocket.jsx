@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 // ✅ Base URL (Render backend for production, localhost for dev)
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:4505";
+const baseURL = "http://localhost:4505";
 
 // ✅ Socket instance
 const socket = io(baseURL, {

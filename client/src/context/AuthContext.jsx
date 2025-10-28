@@ -3,9 +3,17 @@ import React, { useContext, useEffect, useState } from "react";
 const AuthContext = React.createContext();
 
 export const AuthProvider = (props) => {
-  const [user, setUser] = useState(
-    JSON.parse(sessionStorage.getItem("ChatUser")) || ""
-  );
+  const [user, setUser] = useState(() => {
+    const raw = sessionStorage.getItem("ChatUser");
+    if (!raw) return "";
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      // Malformed session entry — clear it and start fresh
+      sessionStorage.removeItem("ChatUser");
+      return "";
+    }
+  });
   const [isLogin, setIsLogin] = useState(!!user);
 
   useEffect(() => {
