@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 const ChatPage = () => {
   const { user, isLogin } = useAuth();
   const navigate = useNavigate();
-  const [users, setUsers] = useState("");
+  const [users, setUsers] = useState([]);
 
   const [selectedFriend, setSelectedFriend] = useState("");
 
@@ -43,6 +43,19 @@ const ChatPage = () => {
       } catch (e) {}
     };
   }, [user, isLogin, navigate]);
+
+  // Move a user to the top of the users list (e.g., when a new message arrives)
+  const moveUserToTop = (userId) => {
+    setUsers((prev) => {
+      if (!Array.isArray(prev)) return prev;
+      const idx = prev.findIndex((u) => u._id === userId);
+      if (idx === -1) return prev; // user not found
+      const newArr = [...prev];
+      const [item] = newArr.splice(idx, 1);
+      newArr.unshift(item);
+      return newArr;
+    });
+  };
 
   return (
     <>
@@ -81,7 +94,7 @@ const ChatPage = () => {
           </div>
         </div>
         <div className="w-11/14 border">
-          <Chatting friend={selectedFriend} />
+          <Chatting friend={selectedFriend} onNewMessage={(userId) => moveUserToTop(userId)} />
         </div>
       </div>
     </>

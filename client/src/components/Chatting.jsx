@@ -5,7 +5,7 @@ import api from "../config/Api";
 import toast from "react-hot-toast";
 import socketAPI from "../config/WebSocket";
 
-const Chatting = ({ friend }) => {
+const Chatting = ({ friend, onNewMessage }) => {
   const { user } = useAuth();
 
   const [messages, setMessages] = useState([]);
@@ -42,7 +42,12 @@ const Chatting = ({ friend }) => {
       const res = await api.post(`/user/sendMessage/${ReceiverID}`, {
         messagePack,
       });
-      setMessages((prev) => [...prev, res.data.data]);
+      const saved = res.data.data;
+      setMessages((prev) => [...prev, saved]);
+      // notify parent to move the chat to top
+      try {
+        onNewMessage && onNewMessage(ReceiverID, saved);
+      } catch (e) {}
       setNewMessage("");
     } catch (error) {
       console.error("Error sending Message:", error);
@@ -85,6 +90,10 @@ const Chatting = ({ friend }) => {
           timestamp: msgPacket.timestamp,
         },
       ]);
+      // notify parent to move the chat to top when a message is received
+      try {
+        onNewMessage && onNewMessage(msgPacket.from, msgPacket);
+      } catch (e) {}
     }
   };
 
