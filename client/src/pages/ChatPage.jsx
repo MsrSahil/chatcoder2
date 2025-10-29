@@ -44,18 +44,45 @@ const ChatPage = () => {
     };
   }, [user, isLogin, navigate]);
 
-  // Move a user to the top of the users list (e.g., when a new message arrives)
-  const moveUserToTop = (userId) => {
+  // Move a user to the top of the users list and optionally update last message/timestamp
+  const moveUserToTop = (userId, message) => {
     setUsers((prev) => {
       if (!Array.isArray(prev)) return prev;
       const idx = prev.findIndex((u) => u._id === userId);
-      if (idx === -1) return prev; // user not found
+      // If user not found, don't change order. (Could insert if desired.)
+      if (idx === -1) return prev;
       const newArr = [...prev];
       const [item] = newArr.splice(idx, 1);
+      // Update last message snippet and timestamp if provided
+      if (message) {
+        const snippet = message.text ? message.text.slice(0, 80) : "";
+        item.lastMessage = snippet;
+        item.lastTimestamp = message.timestamp || new Date().toISOString();
+      }
       newArr.unshift(item);
       return newArr;
     });
   };
+
+  const format_date = (ISO_Date) => {
+    if (!ISO_Date) return "";
+    const date = new Date(ISO_Date);
+    return date.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+  };
+
+  // Listen for lightweight socket alerts for messages (so non-open chats can be reordered)
+  useEffect(() => {
+    const handleAlert = (payload) => {
+      // payload: { from, text, timestamp }
+      if (!payload || !payload.from) return;
+      moveUserToTop(payload.from, payload);
+    };
+
+    socketAPI.on("NewMessageAlert", handleAlert);
+    return () => {
+      socketAPI.off("NewMessageAlert", handleAlert);
+    };
+  }, [socketAPI]);
 
   return (
     <>
@@ -71,30 +98,41 @@ const ChatPage = () => {
           <div className="divider divider-primary pt-5"></div>
           <div id="Firend_List">
             {users &&
-                users.map((element) => (
-                  <div
-                    key={element._id}
-                    className="group flex gap-3 items-center m-3 bg-secondary p-2 text-secondary-content rounded hover:bg-primary hover:text-primary-content cursor-pointer"
-                    onClick={() => {
-                      setSelectedFriend(element);
-                      // mark the currently open chat so notification code can suppress alerts
-                      try {
-                        sessionStorage.setItem("currentChat", element._id);
-                      } catch (e) {}
-                    }}
-                  >
-                  <img
-                    src={element.photo}
-                    alt=""
-                    className="w-12 h-12 rounded-full border border-primary group-hover:border-error"
-                  />
-                  <span className="text-lg">{element.fullName}</span>
+              users.map((element) => (
+                <div
+                  key={element._id}
+                  className="group flex flex-col gap-1 m-3 bg-secondary p-2 text-secondary-content rounded hover:bg-primary hover:text-primary-content cursor-pointer"
+                  onClick={() => {
+                    setSelectedFriend(element);
+                    // mark the currently open chat so notification code can suppress alerts
+                    try {
+                      sessionStorage.setItem("currentChat", element._id);
+                    } catch (e) {}
+                  }}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-3 items-center">
+                      <img
+                        src={element.photo}
+                        alt=""
+                        className="w-12 h-12 rounded-full border border-primary group-hover:border-error"
+                      />
+                      <span className="text-lg">{element.fullName}</span>
+                    </div>
+                    <div className="text-xs opacity-60">
+                      {element.lastTimestamp ? format_date(element.lastTimestamp) : ""}
+                    </div>
+                  </div>
+
+                  <div className="text-sm text-gray-400 truncate pl-16">
+                    {element.lastMessage || "Say Hi!"}
+                  </div>
                 </div>
               ))}
           </div>
         </div>
         <div className="w-11/14 border">
-          <Chatting friend={selectedFriend} onNewMessage={(userId) => moveUserToTop(userId)} />
+          <Chatting friend={selectedFriend} onNewMessage={(userId, msg) => moveUserToTop(userId, msg)} />
         </div>
       </div>
     </>
