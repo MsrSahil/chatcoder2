@@ -53,13 +53,15 @@ const ChatPage = () => {
       if (idx === -1) return prev;
       const newArr = [...prev];
       const [item] = newArr.splice(idx, 1);
+      // create a shallow copy to avoid mutating original state objects
+      const updated = { ...item };
       // Update last message snippet and timestamp if provided
       if (message) {
         const snippet = message.text ? message.text.slice(0, 80) : "";
-        item.lastMessage = snippet;
-        item.lastTimestamp = message.timestamp || new Date().toISOString();
+        updated.lastMessage = snippet;
+        updated.lastTimestamp = message.timestamp || new Date().toISOString();
       }
-      newArr.unshift(item);
+      newArr.unshift(updated);
       return newArr;
     });
   };
@@ -72,9 +74,20 @@ const ChatPage = () => {
 
   // Listen for lightweight socket alerts for messages (so non-open chats can be reordered)
   useEffect(() => {
-    const handleAlert = (payload) => {
+    const handleAlert = async (payload) => {
       // payload: { from, text, timestamp }
       if (!payload || !payload.from) return;
+
+      // If the user isn't in our current list, refresh users first
+      const exists = Array.isArray(users) && users.find((u) => u._id === payload.from);
+      if (!exists) {
+        try {
+          await fetchAllUser();
+        } catch (e) {
+          // fetch failed — still try to move (it will be a no-op)
+        }
+      }
+
       moveUserToTop(payload.from, payload);
     };
 
