@@ -70,3 +70,25 @@ export const ReceiveMessage = async (req, res, next) => {
     next(error);
   }
 };
+
+export const GetUserById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    if (!id) {
+      const error = new Error("User id required");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    const user = await User.findById(id).select("-password");
+    if (!user) {
+      const error = new Error("User not found");
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    res.status(200).json({ message: "User fetched", data: user });
+  } catch (error) {
+    next(error);
+  }
+};

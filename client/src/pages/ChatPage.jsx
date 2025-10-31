@@ -78,13 +78,25 @@ const ChatPage = () => {
       // payload: { from, text, timestamp }
       if (!payload || !payload.from) return;
 
-      // If the user isn't in our current list, refresh users first
+      // If the user isn't in our current list, request that single user from server
       const exists = Array.isArray(users) && users.find((u) => u._id === payload.from);
       if (!exists) {
         try {
-          await fetchAllUser();
+          const res = await api.get(`/user/get/${payload.from}`);
+          const single = res.data.data;
+          // insert at top with last message/timestamp
+          setUsers((prev) => {
+            if (!Array.isArray(prev)) return [single];
+            // avoid duplicate if another fetch/populate happened
+            const filtered = prev.filter((u) => u._id !== single._id);
+            const snippet = payload.text ? payload.text.slice(0, 80) : "";
+            single.lastMessage = snippet;
+            single.lastTimestamp = payload.timestamp || new Date().toISOString();
+            return [single, ...filtered];
+          });
+          return; // already moved/inserted
         } catch (e) {
-          // fetch failed — still try to move (it will be a no-op)
+          // If fetching single user failed, fall back to no-op move
         }
       }
 
@@ -95,7 +107,7 @@ const ChatPage = () => {
     return () => {
       socketAPI.off("NewMessageAlert", handleAlert);
     };
-  }, [socketAPI]);
+  }, [socketAPI, users]);
 
   return (
     <>
