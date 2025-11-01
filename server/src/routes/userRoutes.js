@@ -2,6 +2,7 @@ import express from "express";
 import { Protect } from "../middlewares/authMiddleware.js";
 import {
   GetAllUser,
+  GetUserById,
   SendMessage,
   ReceiveMessage,
 } from "../controllers/userController.js";
