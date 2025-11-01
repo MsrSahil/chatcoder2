@@ -81,23 +81,23 @@ const ChatPage = () => {
       // If the user isn't in our current list, request that single user from server
       const exists = Array.isArray(users) && users.find((u) => u._id === payload.from);
       if (!exists) {
-        try {
-          const res = await api.get(`/user/get/${payload.from}`);
-          const single = res.data.data;
-          // insert at top with last message/timestamp
-          setUsers((prev) => {
-            if (!Array.isArray(prev)) return [single];
-            // avoid duplicate if another fetch/populate happened
-            const filtered = prev.filter((u) => u._id !== single._id);
-            const snippet = payload.text ? payload.text.slice(0, 80) : "";
-            single.lastMessage = snippet;
-            single.lastTimestamp = payload.timestamp || new Date().toISOString();
-            return [single, ...filtered];
-          });
-          return; // already moved/inserted
-        } catch (e) {
-          // If fetching single user failed, fall back to no-op move
-        }
+        // Insert a lightweight placeholder user — faster than fetching full user details.
+        const placeholder = {
+          _id: payload.from,
+          fullName: "Unknown User",
+          photo: "",
+          lastMessage: payload.text ? payload.text.slice(0, 80) : "",
+          lastTimestamp: payload.timestamp || new Date().toISOString(),
+        };
+
+        setUsers((prev) => {
+          if (!Array.isArray(prev)) return [placeholder];
+          // avoid duplicate if another fetch/populate happened
+          const filtered = prev.filter((u) => u._id !== placeholder._id);
+          return [placeholder, ...filtered];
+        });
+
+        return;
       }
 
       moveUserToTop(payload.from, payload);
