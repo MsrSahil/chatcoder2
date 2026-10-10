@@ -14,9 +14,11 @@ import webSocket from "./src/webSocket.js";
 
 const app = express();
 
+const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: clientUrl,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // add OPTIONS
   })
@@ -50,7 +52,7 @@ const httpServer = http.createServer(app);
 // ✅ Socket.IO with proper CORS
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: clientUrl,
     credentials: true,
     methods: ["GET", "POST"],
   },
