@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 
 // FAQ Data
 const faqData = [
-  { q: "Is App free?", a: "Yes! ChatApp is 100% free to use with no hidden charges." },
-  { q: "Can I use it on multiple devices?", a: "Absolutely, your messages sync across all devices instantly." },
-  { q: "Is my data safe?", a: "Yes, we use end-to-end encryption to keep your data private." },
+  { q: "Is ChatApp free?", a: "Yes! ChatApp is 100% free to use." },
+  { q: "Can I use it on multiple devices?", a: "Absolutely, your active sessions receive messages instantly across all your connected devices." },
+  { q: "Can I share images or make video calls?", a: "Currently, ChatApp focuses entirely on delivering a lightning-fast, lightweight text messaging experience." },
 ];
 
 // Splash Screen
@@ -40,24 +40,16 @@ const HomePage = () => {
   }, []);
 
   const features = [
-    { icon: "💬", title: "Real-Time Chat", desc: "Send & receive messages instantly." },
-    { icon: "👥", title: "Group Chats", desc: "Create groups for friends or work." },
-    { icon: "📁", title: "File Sharing", desc: "Share images, videos, and docs securely." },
-    { icon: "📞", title: "Voice Calls", desc: "Crystal-clear voice calls powered by Raju AudioWala." },
-    { icon: "🎥", title: "Video Calls", desc: "High-quality video with screen sharing." },
-    { icon: "🔒", title: "Secure & Private", desc: "End-to-end encryption keeps data safe." },
+    { icon: "💬", title: "Real-Time Chat", desc: "Send & receive text messages instantly without reloading." },
+    { icon: "🔄", title: "Multi-Device Sync", desc: "Receive your messages simultaneously on all active devices." },
+    { icon: "🔔", title: "Instant Alerts", desc: "Get notified immediately when friends send you a message." },
+    { icon: "🔒", title: "Secure Access", desc: "Your account is protected by encrypted authentication." },
   ];
 
   const steps = [
     { num: "1", title: "Sign Up", desc: "Create your free ChatApp account in seconds." },
-    { num: "2", title: "Find Friends", desc: "Add contacts or join groups to start chatting." },
-    { num: "3", title: "Start Chatting", desc: "Enjoy messages, calls, and file sharing." },
-  ];
-
-  const testimonials = [
-    { name: "Ayush", text: "🔥 ChatApp is super smooth and fast! Love the design." },
-    { name: "Lalit", text: "💯 Finally a chat app that feels modern and easy to use." },
-    { name: "Swahil", text: "🚀 Secure, fast, and I can use it on all my devices." },
+    { num: "2", title: "Find Friends", desc: "Select a contact from your list to start chatting." },
+    { num: "3", title: "Start Chatting", desc: "Enjoy instant messaging with real-time updates." },
   ];
 
   return (
@@ -82,7 +74,7 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.3 }}
             >
-              ChatApp brings you closer to friends, family, and your community with real-time conversations 🚀
+              ChatApp brings you closer to friends with lightning-fast, real-time text conversations 🚀
             </motion.p>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -109,49 +101,18 @@ const HomePage = () => {
             >
               Features You’ll Love 💖
             </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
               {features.map((f, i) => (
                 <motion.div
                   key={i}
-                  className="p-6 bg-base-100 rounded-2xl shadow-lg border border-gray-100"
+                  className="p-6 bg-base-100 rounded-2xl shadow-lg border border-gray-100 text-center flex flex-col items-center"
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.2 }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
                 >
-                  <div className="text-4xl">{f.icon}</div>
-                  <h3 className="text-xl font-semibold mt-4">{f.title}</h3>
+                  <div className="text-5xl mb-4">{f.icon}</div>
+                  <h3 className="text-xl font-semibold">{f.title}</h3>
                   <p className="text-gray-600 mt-2">{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-
-          {/* STATS */}
-          <section className="px-10 py-20 bg-gradient-to-r from-secondary/5 to-primary/5 text-center">
-            <motion.h2
-              className="text-4xl font-bold text-primary mb-12"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              Trusted by Thousands 🌍
-            </motion.h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
-              {[
-                { num: "1M+", text: "Downloads" },
-                { num: "500K+", text: "Daily Users" },
-                { num: "99.9%", text: "Uptime" },
-                { num: "120+", text: "Countries" },
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  className="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.7, delay: i * 0.2 }}
-                >
-                  <h3 className="text-3xl font-bold text-primary">{stat.num}</h3>
-                  <p className="text-gray-600">{stat.text}</p>
                 </motion.div>
               ))}
             </div>
@@ -185,7 +146,7 @@ const HomePage = () => {
           </section>
 
           {/* DEMO */}
-          <section className="px-10 py-20 bg-base-200/60">
+          <section className="px-10 py-20 bg-white">
             <motion.h2
               className="text-4xl font-bold text-center text-secondary mb-12"
               initial={{ opacity: 0, y: 50 }}
@@ -195,13 +156,13 @@ const HomePage = () => {
               Experience the Magic ✨
             </motion.h2>
             <motion.div
-              className="max-w-4xl mx-auto bg-white/70 shadow-xl rounded-3xl p-8 backdrop-blur-lg"
+              className="max-w-4xl mx-auto bg-base-200/50 shadow-xl rounded-3xl p-8 backdrop-blur-lg border border-gray-100"
               initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9 }}
             >
               <div className="chat chat-start">
-                <div className="chat-bubble bg-gray-200 animate-bounce">Hi there! 👋</div>
+                <div className="chat-bubble bg-gray-200 text-gray-800 animate-bounce">Hi there! 👋</div>
               </div>
               <div className="chat chat-end mt-4">
                 <div className="chat-bubble bg-primary text-white animate-pulse">
@@ -211,34 +172,8 @@ const HomePage = () => {
             </motion.div>
           </section>
 
-          {/* TESTIMONIALS */}
-          <section className="px-10 py-20 bg-white">
-            <motion.h2
-              className="text-4xl font-bold text-center text-primary mb-12"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              Loved by Our Users ❤️
-            </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {testimonials.map((t, i) => (
-                <motion.div
-                  key={i}
-                  className="p-6 bg-base-100 rounded-2xl shadow-lg border border-gray-100"
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.2 }}
-                >
-                  <p className="text-gray-600 italic">“{t.text}”</p>
-                  <h3 className="mt-4 font-semibold text-primary">- {t.name}</h3>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-
           {/* FAQ */}
-          <section className="px-10 py-20 bg-white">
+          <section className="px-10 py-20 bg-base-200/60">
             <motion.h2
               className="text-4xl font-bold text-center text-primary mb-12"
               initial={{ opacity: 0, y: 50 }}
@@ -251,19 +186,19 @@ const HomePage = () => {
               {faqData.map((item, i) => (
                 <motion.div
                   key={i}
-                  className="p-6 border rounded-xl bg-base-100 shadow-md cursor-pointer"
+                  className="p-6 border rounded-xl bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: i * 0.1 }}
                   onClick={() => setOpenFAQ(openFAQ === i ? null : i)}
                 >
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">{item.q}</h3>
-                    <span>{openFAQ === i ? "🔼" : "🔽"}</span>
+                     <h3 className="text-lg font-semibold text-gray-800">{item.q}</h3>
+                    <span className="text-primary">{openFAQ === i ? "🔼" : "🔽"}</span>
                   </div>
                   {openFAQ === i && (
                     <motion.p
-                      className="text-gray-600 mt-2"
+                      className="text-gray-600 mt-3"
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
@@ -276,7 +211,6 @@ const HomePage = () => {
               ))}
             </div>
           </section>
-
 
           {/* CTA */}
           <section className="px-10 py-20 text-center bg-gradient-to-r from-primary/10 to-secondary/10">
