@@ -33,6 +33,12 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Welcome to ChatApp API! The backend is up and running.",
+  });
+});
+
 app.get("/api", (req, res) => {
   res.status(200).json({
     message: "ChatApp Backend is running",
