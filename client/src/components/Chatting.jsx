@@ -138,7 +138,8 @@ const Chatting = ({ friend, onNewMessage }) => {
           <div className="bg-secondary my-2 h-[75vh] mx-3 rounded p-3 overflow-y-auto">
             {messages && messages.length > 0 ? (
               messages.map((message, index) => {
-                const isSender = message.senderID._id === SenderID;
+                const senderIdStr = message.senderID?._id || message.senderID;
+                const isSender = senderIdStr === SenderID;
                 return (
                   <div
                     key={index}

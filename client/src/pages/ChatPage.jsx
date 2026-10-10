@@ -112,7 +112,7 @@ const ChatPage = () => {
   return (
     <>
       <div className="min-h-screen bg-base-100 flex">
-        <div className="w-3/14 border px-5 pt-5">
+        <div className="w-1/4 border px-5 pt-5 flex-shrink-0">
           <div className="flex gap-3 items-center">
             <img src={user.photo} alt="" className="w-14 h-14 rounded" />
             <div className="flex flex-col">
@@ -156,7 +156,7 @@ const ChatPage = () => {
               ))}
           </div>
         </div>
-        <div className="w-11/14 border">
+        <div className="w-3/4 border flex-grow">
           <Chatting friend={selectedFriend} onNewMessage={(userId, msg) => moveUserToTop(userId, msg)} />
         </div>
       </div>
