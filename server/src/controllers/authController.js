@@ -236,7 +236,13 @@ export const SendOTPForLogin = async (req, res, next) => {
 
 export const Logout = (req, res, next) => {
   try {
-    res.clearCookie("token");
+    const isProd = process.env.NODE_ENV === "production";
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      path: "/",
+    });
     res.status(200).json({ message: "Logout Successful" });
   } catch (error) {
     next(error);
