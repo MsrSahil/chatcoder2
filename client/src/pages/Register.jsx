@@ -38,7 +38,7 @@ const Register = () => {
       console.error("Error during registration:", error);
       toast.error(
         `Error : ${error.response?.status || error.message} | ${
-          error.response?.data.message || ""
+          error.response?.data?.message || ""
         }`
       );
     }

@@ -38,7 +38,7 @@ const OTPModal = ({ isOpen, onClose, callingPage, data }) => {
     } catch (error) {
       toast.error(
         `Error : ${error.response?.status || error.message} | ${
-          error.response?.data.message || ""
+          error.response?.data?.message || ""
         }`
       );
     }
