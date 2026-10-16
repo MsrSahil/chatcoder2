@@ -14,12 +14,16 @@ import webSocket from "./src/webSocket.js";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 const allowedOrigins = [
+  "https://chatcoder2.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:3000",
 ];
+
 if (process.env.CLIENT_URL) {
   process.env.CLIENT_URL.split(",").forEach((url) => {
     const trimmed = url.trim();
@@ -31,11 +35,12 @@ if (process.env.CLIENT_URL) {
 
 const isOriginAllowed = (origin) => {
   if (!origin) return true;
+  const normalized = origin.toLowerCase().trim();
   if (
-    allowedOrigins.includes(origin) ||
-    origin.endsWith(".vercel.app") ||
-    origin.includes("localhost") ||
-    origin.includes("127.0.0.1")
+    allowedOrigins.some((allowed) => normalized === allowed.toLowerCase()) ||
+    normalized.endsWith(".vercel.app") ||
+    normalized.includes("localhost") ||
+    normalized.includes("127.0.0.1")
   ) {
     return true;
   }
@@ -44,14 +49,14 @@ const isOriginAllowed = (origin) => {
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (isOriginAllowed(origin)) {
+    if (!origin || isOriginAllowed(origin)) {
       return callback(null, true);
     }
     return callback(null, true);
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
