@@ -18,9 +18,18 @@ const ChatPage = () => {
   const fetchAllUser = async () => {
     try {
       const res = await api.get("/user/allUsers");
-      setUsers(res.data.data);
+      const userList = Array.isArray(res.data?.data) ? res.data.data : [];
+      setUsers(userList);
     } catch (error) {
       console.error("Error during fetch users:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired or unauthorized. Please log in again.");
+        sessionStorage.removeItem("ChatUser");
+        sessionStorage.removeItem("token");
+        localStorage.removeItem("token");
+        navigate("/login");
+        return;
+      }
       toast.error(
         `Error : ${error.response?.status || error.message} | ${
           error.response?.data?.message || ""
@@ -35,14 +44,17 @@ const ChatPage = () => {
     } else if (user?._id) {
       fetchAllUser();
       socketAPI.emit("CreatePath", user._id);
-    }
 
-    return () => {
-      if (user?._id) socketAPI.emit("DeletePath", user._id);
-      try {
-        sessionStorage.removeItem("currentChat");
-      } catch (e) {}
-    };
+      const onConnect = () => {
+        socketAPI.emit("CreatePath", user._id);
+      };
+      socketAPI.on("connect", onConnect);
+
+      return () => {
+        socketAPI.off("connect", onConnect);
+        if (user?._id) socketAPI.emit("DeletePath", user._id);
+      };
+    }
   }, [user, isLogin, navigate]);
 
   const moveUserToTop = (userId, message) => {
@@ -65,13 +77,29 @@ const ChatPage = () => {
 
   const format_date = (ISO_Date) => {
     if (!ISO_Date) return "";
-    const date = new Date(ISO_Date);
-    const today = new Date();
-    const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-    if (isToday) {
-      return date.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: '2-digit', minute:'2-digit' });
+    try {
+      const date = new Date(ISO_Date);
+      if (isNaN(date.getTime())) return "";
+      const today = new Date();
+      const isToday =
+        date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear();
+      if (isToday) {
+        return date.toLocaleTimeString("en-IN", {
+          timeZone: "Asia/Kolkata",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+      return date.toLocaleDateString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        day: "2-digit",
+        month: "short",
+      });
+    } catch (e) {
+      return "";
     }
-    return date.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: '2-digit', month: 'short' });
   };
 
   useEffect(() => {

@@ -17,7 +17,7 @@ const genToken = (user, res) => {
     path: "/",
   });
 
-  return;
+  return token;
 };
 
 export default genToken;

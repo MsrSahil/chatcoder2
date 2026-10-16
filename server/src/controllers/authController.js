@@ -90,11 +90,15 @@ export const Login = async (req, res, next) => {
       await OTP.deleteOne({ email });
     }
     console.log("Login successful");
-    genToken(existingUser, res);
+    const token = genToken(existingUser, res);
+
+    const userObj = existingUser.toObject ? existingUser.toObject() : { ...existingUser };
+    delete userObj.password;
 
     res.status(200).json({
       message: "Login successful",
-      data: existingUser,
+      data: userObj,
+      token,
     });
   } catch (error) {
     next(error);
@@ -277,8 +281,10 @@ export const GoogleLogin = async (req, res, next) => {
         type: "googleUser",
         photo,
       });
-      genToken(newUser, res);
-      res.status(200).json({ message: "Login Sucessfully", data: newUser });
+      const token = genToken(newUser, res);
+      const userObj = newUser.toObject ? newUser.toObject() : { ...newUser };
+      delete userObj.password;
+      res.status(200).json({ message: "Login Sucessfully", data: userObj, token });
     } else if (existingUser && existingUser.type === "normalUser") {
       const hashedId = await bcrypt.hash(Gid, 10);
 
@@ -286,11 +292,13 @@ export const GoogleLogin = async (req, res, next) => {
       existingUser.type = "googleUser";
 
       await existingUser.save();
-      genToken(existingUser, res);
+      const token = genToken(existingUser, res);
+      const userObj = existingUser.toObject ? existingUser.toObject() : { ...existingUser };
+      delete userObj.password;
 
       res
         .status(200)
-        .json({ message: "Login Sucessfully", data: existingUser });
+        .json({ message: "Login Sucessfully", data: userObj, token });
     } else {
       const isVerified = await bcrypt.compare(Gid, existingUser.googleId);
       if (!isVerified) {
@@ -299,11 +307,13 @@ export const GoogleLogin = async (req, res, next) => {
         return next(error);
       }
 
-      genToken(existingUser, res);
+      const token = genToken(existingUser, res);
+      const userObj = existingUser.toObject ? existingUser.toObject() : { ...existingUser };
+      delete userObj.password;
 
       res
         .status(200)
-        .json({ message: "Login Sucessfully", data: existingUser });
+        .json({ message: "Login Sucessfully", data: userObj, token });
     }
   } catch (error) {
     next(error);

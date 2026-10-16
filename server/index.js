@@ -14,15 +14,47 @@ import webSocket from "./src/webSocket.js";
 
 const app = express();
 
-const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:3000",
+];
+if (process.env.CLIENT_URL) {
+  process.env.CLIENT_URL.split(",").forEach((url) => {
+    const trimmed = url.trim();
+    if (trimmed && !allowedOrigins.includes(trimmed)) {
+      allowedOrigins.push(trimmed);
+    }
+  });
+}
 
-app.use(
-  cors({
-    origin: clientUrl,
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // add OPTIONS
-  })
-);
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  if (
+    allowedOrigins.includes(origin) ||
+    origin.endsWith(".vercel.app") ||
+    origin.includes("localhost") ||
+    origin.includes("127.0.0.1")
+  ) {
+    return true;
+  }
+  return false;
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 
 
 app.use(express.json());
@@ -58,7 +90,12 @@ const httpServer = http.createServer(app);
 // ✅ Socket.IO with proper CORS
 const io = new Server(httpServer, {
   cors: {
-    origin: clientUrl,
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ["GET", "POST"],
   },

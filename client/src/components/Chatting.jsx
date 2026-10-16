@@ -79,17 +79,27 @@ const Chatting = ({ friend, onNewMessage }) => {
 
   const format_time = (ISO_Date) => {
     if (!ISO_Date) return "";
-    const date = new Date(ISO_Date);
-    return date.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: '2-digit', minute:'2-digit' });
+    try {
+      const date = new Date(ISO_Date);
+      if (isNaN(date.getTime())) return "";
+      return date.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: '2-digit', minute:'2-digit' });
+    } catch (e) {
+      return "";
+    }
   };
 
   const fetchMessages = async () => {
+    if (!friend?._id) return;
     try {
       const res = await api.get(`/user/receiveMessage/${friend._id}`);
-      setMessages(res.data.data);
+      setMessages(Array.isArray(res.data?.data) ? res.data.data : []);
     } catch (error) {
       console.error("Error fetching Chat:", error);
-      toast.error("Could not load messages.");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Could not load messages.");
+      }
     }
   };
 

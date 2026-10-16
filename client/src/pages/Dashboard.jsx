@@ -17,9 +17,19 @@ const Dashboard = () => {
   const fetchStats = async () => {
     try {
       const res = await api.get("/user/allUsers");
-      setStats({ totalUsers: res.data.data.length });
+      const usersList = Array.isArray(res.data?.data) ? res.data.data : [];
+      setStats({ totalUsers: usersList.length });
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching stats:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        sessionStorage.removeItem("ChatUser");
+        sessionStorage.removeItem("token");
+        localStorage.removeItem("token");
+        setUser("");
+        setIsLogin(false);
+        navigate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -27,16 +37,18 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await api.get("/auth/logout");
-      toast.success(res.data.message);
+      await api.get("/auth/logout");
+    } catch (error) {
+      console.warn("Logout request failed:", error);
+    } finally {
+      toast.success("Logout Successful");
       setUser("");
       setIsLogin(false);
-      try {
-        sessionStorage.removeItem("currentChat");
-      } catch (e) {}
+      sessionStorage.removeItem("ChatUser");
+      sessionStorage.removeItem("token");
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("currentChat");
       navigate("/");
-    } catch (error) {
-      toast.error("Failed to logout. Please try again.");
     }
   };
 

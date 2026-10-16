@@ -23,6 +23,10 @@ const OTPModal = ({ isOpen, onClose, callingPage, data }) => {
         res = await API.post("/auth/register", data);
       } else {
         res = await API.post("/auth/login", data);
+        if (res.data.token) {
+          sessionStorage.setItem("token", res.data.token);
+          localStorage.setItem("token", res.data.token);
+        }
         setUser(res.data.data);
         setIsLogin(true);
         sessionStorage.setItem("ChatUser", JSON.stringify(res.data.data));

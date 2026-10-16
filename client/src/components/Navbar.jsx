@@ -84,11 +84,11 @@ const Navbar = () => {
               <Link to="/dashboard">
                 <div className="flex gap-3 items-center me-5">
                   <img
-                    src={user.photo}
+                    src={user.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.fullName || "User")}`}
                     alt=""
                     className="h-8 w-8 rounded-full object-cover"
                   />
-                  <span>{user.fullName.split(" ")[0]}</span>
+                  <span>{user?.fullName ? user.fullName.split(" ")[0] : "User"}</span>
                 </div>
               </Link>
             </>

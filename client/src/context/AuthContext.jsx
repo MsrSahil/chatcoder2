@@ -20,7 +20,16 @@ export const AuthProvider = (props) => {
     setIsLogin(!!user);
   }, [user]);
 
-  const value = { user, setUser, isLogin, setIsLogin };
+  const logout = () => {
+    sessionStorage.removeItem("ChatUser");
+    sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("currentChat");
+    setUser("");
+    setIsLogin(false);
+  };
+
+  const value = { user, setUser, isLogin, setIsLogin, logout };
 
   return (
     <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>

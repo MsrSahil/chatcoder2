@@ -31,6 +31,10 @@ const Login = () => {
         setIsOTPModalOpen(true);
       } else {
         toast.success(res.data.message);
+        if (res.data.token) {
+          sessionStorage.setItem("token", res.data.token);
+          localStorage.setItem("token", res.data.token);
+        }
         setUser(res.data.data);
         setIsLogin(true);
         sessionStorage.setItem("ChatUser", JSON.stringify(res.data.data));
@@ -39,7 +43,7 @@ const Login = () => {
     } catch (error) {
       toast.error(
         `Error : ${error.response?.status || error.message} | ${
-          error.response?.data.message || ""
+          error.response?.data?.message || ""
         }`
       );
     }
@@ -49,6 +53,10 @@ const Login = () => {
     try {
       const res = await api.post("/auth/googleLogin", userData);
       toast.success(res.data.message);
+      if (res.data.token) {
+        sessionStorage.setItem("token", res.data.token);
+        localStorage.setItem("token", res.data.token);
+      }
       sessionStorage.setItem("ChatUser", JSON.stringify(res.data.data));
       setUser(res.data.data);
       setIsLogin(true);

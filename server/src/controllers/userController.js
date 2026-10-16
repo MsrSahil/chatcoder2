@@ -1,9 +1,13 @@
+import mongoose from "mongoose";
 import Message from "../models/messageModel.js";
 import User from "../models/userModel.js";
 
 export const GetAllUser = async (req, res, next) => {
   try {
-    const currentUser = req.user._id;
+    const currentUser = req.user?._id;
+    if (!currentUser) {
+      return res.status(401).json({ message: "Unauthorized", data: [] });
+    }
     const users = await User.find({ _id: { $ne: currentUser } }).select(
       "-password"
     );
@@ -16,11 +20,18 @@ export const GetAllUser = async (req, res, next) => {
 export const SendMessage = async (req, res, next) => {
   try {
     const receiverID = req.params.id;
-    const senderID = req.user._id;
+    const senderID = req.user?._id;
 
-    const { text, timestamp } = req.body.messagePack;
+    if (!mongoose.Types.ObjectId.isValid(receiverID)) {
+      const error = new Error("Invalid receiver ID");
+      error.statusCode = 400;
+      return next(error);
+    }
 
-    if (!receiverID || !senderID || !text || !timestamp) {
+    const messagePack = req.body.messagePack || req.body;
+    const { text, timestamp } = messagePack || {};
+
+    if (!receiverID || !senderID || !text) {
       const error = new Error("Please fill all the fields");
       error.statusCode = 400;
       return next(error);
@@ -30,7 +41,7 @@ export const SendMessage = async (req, res, next) => {
       receiverID,
       senderID,
       text,
-      timestamp,
+      timestamp: timestamp || new Date().toISOString(),
     });
 
     const populatedMessage = await Message.findById(newMessage._id)
@@ -48,12 +59,16 @@ export const SendMessage = async (req, res, next) => {
 export const ReceiveMessage = async (req, res, next) => {
   try {
     const ReceiverID = req.params.id;
-    const SenderID = req.user._id;
+    const SenderID = req.user?._id;
 
     if (!ReceiverID || !SenderID) {
       const error = new Error("Please fill all the fields");
       error.statusCode = 400;
       return next(error);
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(ReceiverID)) {
+      return res.status(200).json({ message: "Invalid user ID", data: [] });
     }
 
     const conversation = await Message.find({
@@ -74,8 +89,8 @@ export const ReceiveMessage = async (req, res, next) => {
 export const GetUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
-    if (!id) {
-      const error = new Error("User id required");
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      const error = new Error("Valid user id required");
       error.statusCode = 400;
       return next(error);
     }
